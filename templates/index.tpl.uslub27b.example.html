@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Storis uslub-27 v4</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-var.ttf"); font-weight: 100 900; }
+      @font-face { font-family: "Marker"; src: url("assets/fonts/PermanentMarker.ttf"); }
+      @font-face { font-family: "Anton"; src: url("assets/fonts/Anton.ttf"); }
+      @font-face { font-family: "Hand"; src: url("assets/fonts/Caveat-var.ttf"); font-weight: 400 700; }
+
+      :root { --yel: #fae837; --red: #e3202a; --org: #ff7a1a; --ink: #ffffff; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; }
+
+      #cam { position: absolute; inset: 0; transform-origin: 50% 32%; }
+      #aroll, .broll { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 1100px; pointer-events: none;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.16) 40%, rgba(0,0,0,.30) 100%); }
+      #neg { position: absolute; inset: 0; opacity: 0; pointer-events: none; backdrop-filter: invert(1); -webkit-backdrop-filter: invert(1); }
+
+      /* ikki darajali matn bloki — referensdagidek kadr o'rtasida */
+      .blk { position: absolute; left: 60px; right: 60px; }
+      .blk.al-l { left: 110px; right: 40px; }
+      .blk.al-c .blk-in { align-items: center; text-align: center; }
+      .blk.al-c .r { justify-content: center; }
+      .blk-in { display: flex; flex-direction: column; gap: 4px; transform-origin: 30% 50%; }
+      .r { display: flex; flex-wrap: nowrap; column-gap: 0.26em;
+        text-shadow: 0 2px 12px rgba(0,0,0,.42), 0 1px 3px rgba(0,0,0,.35); }
+      .w { position: relative; display: inline-block; }
+      .r.k-kw { font: 700 136px/1.02 "Outfit", sans-serif; color: var(--yel); letter-spacing: -0.02em; }
+      .r.k-w, .r.k-sc { font: 600 66px/1.08 "Outfit", sans-serif; color: var(--ink); letter-spacing: -0.01em; }
+      .r.k-ghost { font: 500 46px/1.1 "Outfit", sans-serif; color: rgba(255,255,255,.9); }
+      .r.k-brk { font: 600 38px/1.2 "Outfit", sans-serif; color: rgba(255,255,255,.92); margin-top: 6px; }
+      .r.k-num { font: 700 200px/1.0 "Outfit", sans-serif; color: var(--ink); letter-spacing: -0.03em; }
+      .r.k-big, .r.k-bigy, .r.k-bigr { font: 700 210px/0.98 "Outfit", sans-serif; color: var(--ink); letter-spacing: -0.03em; }
+      .r.k-bigy { color: var(--yel); font-size: 130px; }
+      .r.k-bigr { font-size: 190px; }
+      .r.k-bigr { color: var(--red); }
+      .r.k-big .w, .r.k-bigy .w, .r.k-bigr .w { transform-origin: 20% 60%; }
+      .w.it { font-style: italic; color: var(--yel); }
+      .qm { color: var(--yel); margin: 0 0.06em; }
+      .star { display: inline-block; color: var(--yel); font-size: 0.6em; vertical-align: top; margin-left: 4px; }
+      .draw { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
+      .draw.red { stroke: var(--red); stroke-width: 5; }
+      .zz { position: absolute; left: -4%; width: 108%; bottom: -14px; height: 18px; overflow: visible; }
+      .ring { position: absolute; left: -9%; top: -14%; width: 118%; height: 128%; overflow: visible; }
+      .ring .draw.red { stroke-width: 6; }
+      .note { position: absolute; transform-origin: 0 50%; }
+      .note-in { display: inline-block; font: 700 76px/1 "Hand", cursive; color: var(--red); clip-path: inset(0 100% 0 0);
+        text-shadow: 0 2px 10px rgba(0,0,0,.35); white-space: nowrap; }
+
+      /* uslub-28: oq fakt-karta + 3D emoji */
+      .fcard { position: absolute; filter: blur(0.35px); }
+      .fc-in { position: relative; border-radius: 28px; padding: 18px 206px 24px 30px;
+        background: linear-gradient(180deg, #fbfaf8 0%, #f1f0ee 55%, #e6e5e2 100%);
+        border: 7px solid rgba(255,255,255,.97);
+        box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.07), inset 0 -4px 8px rgba(0,0,0,.07), inset 0 3px 4px rgba(255,255,255,.9),
+                    0 16px 34px rgba(0,0,0,.30), 0 3px 6px rgba(0,0,0,.16); }
+      .fc-t { font: 800 90px/1.0 "Outfit", sans-serif; color: #2b2b2b; letter-spacing: -0.035em; white-space: nowrap; }
+      .fc-s { margin-top: 6px; font: 500 40px/1.12 "Outfit", sans-serif; color: #343434; letter-spacing: -0.01em; white-space: nowrap; }
+      .fc-e { position: absolute; right: -26px; top: -58px; width: 214px; height: 214px; transform-origin: 50% 60%;
+        filter: drop-shadow(0 12px 14px rgba(0,0,0,.30)) drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+
+      /* to'q shisha plashka subtitr */
+      .plate { position: absolute; left: 110px; right: 110px; text-align: center; }
+      .pl-bg { position: absolute; inset: -22px -30px; border-radius: 20px; transform-origin: 50% 50%; background: rgba(20,20,24,.55);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+      .pl-t { position: relative; font: 600 52px/1.16 "Outfit", sans-serif; color: #fff; }
+
+      /* qizil qo'lyozma izoh */
+      #hw { position: absolute; left: 70px; top: 1712px; font: 400 58px/1 "Marker", cursive; color: var(--red);
+        transform: rotate(-5deg); transform-origin: 0 50%; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
+      #hw-in { display: inline-block; clip-path: inset(0 100% 0 0); }
+
+      /* doira-niqob B-roll */
+      #circ-bg { position: absolute; inset: 0; background: radial-gradient(70% 50% at 50% 42%, #15140f 0%, #050505 70%); }
+      #b4_circle { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: circle(0% at 50% 40%); }
+      #circ-wrap { position: absolute; inset: 0; }
+      #circ-ring { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+      #circ-ring circle { fill: none; stroke: rgba(255,255,255,.75); stroke-width: 3; }
+      #ctx { position: absolute; left: 58px; right: 58px; top: 1300px; }
+      #ctx .c-w { font: 600 52px/1.14 "Outfit", sans-serif; color: #fff; }
+      #ctx .c-h { font: 700 120px/1.1 "Hand", cursive; color: var(--yel); margin: 10px 0 22px;
+        text-shadow: 0 0 22px rgba(250,232,55,.55), 0 0 4px rgba(250,232,55,.8); }
+      #ctx .c-h span { display: inline-block; clip-path: inset(0 100% 0 0); }
+      #ctx-in { transform-origin: 0% 0%; }
+
+      /* CTA pill */
+      #cta { position: absolute; left: 110px; top: 1560px; }
+      .pill { position: relative; height: 100px; border-radius: 50px; background: #fff; display: flex; align-items: center;
+        padding: 0 110px 0 14px; gap: 18px; box-shadow: 0 10px 34px rgba(0,0,0,.3); overflow: hidden; }
+      .pill img { position: relative; z-index: 2; width: 76px; height: 76px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #e1306c; }
+      .pill-fill { position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(90deg, #ff9a3c, var(--org)); transform-origin: 0 50%; transform: scaleX(0); }
+      .pill-t { position: relative; z-index: 2; display: grid; font: 600 36px/1 "Outfit", sans-serif; letter-spacing: -0.01em; }
+      .pill-t > * { grid-area: 1 / 1; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+      .pill-t .ver { width: 34px; height: 34px; }
+      #pt1 { color: #141414; }
+      #pt2 { color: #fff; opacity: 0; }
+      .pill-ok { position: absolute; z-index: 3; right: 14px; top: 13px; width: 74px; height: 74px; border-radius: 50%; background: #fff;
+        display: flex; align-items: center; justify-content: center; opacity: 0; }
+      .pill-ok svg { width: 40px; height: 40px; overflow: visible; }
+
+      /* oq yakun ekran */
+      #white { position: absolute; inset: 0; background: #fff; }
+      #endcard { position: absolute; left: 0; right: 0; top: 600px; display: flex; flex-direction: column; align-items: center; }
+      .ec-card { position: relative; width: 860px; height: 484px; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 70px rgba(0,0,0,.28); }
+      .ec-card img { width: 100%; height: 100%; object-fit: cover; }
+      .ec-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,.86) 100%); }
+      .ec-t { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; }
+      .ec-k { font: 400 40px/1 "Anton", sans-serif; color: #ffae5c; letter-spacing: .04em; text-shadow: 0 2px 10px rgba(0,0,0,.7); }
+      .ec-b { font: 400 132px/1 "Anton", sans-serif; color: #fff; letter-spacing: 0.01em; margin-top: 6px; text-shadow: 0 4px 18px rgba(0,0,0,.6); }
+      .ec-row { display: flex; align-items: center; gap: 18px; margin-top: 40px; }
+      .ec-row .ec-s { font: 700 54px/1 "Outfit", sans-serif; color: #111; }
+      .ec-pill { display: flex; align-items: center; gap: 10px; padding: 12px 22px 12px 14px; border-radius: 14px; background: #ff0033; color: #fff; font: 700 36px/1 "Outfit", sans-serif; }
+      .ec-pill svg { width: 34px; height: 34px; }
+      .ec-sub { margin-top: 26px; font: 500 38px/1 "Outfit", sans-serif; color: #555; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{DUR}}" data-width="1080" data-height="1920">
+      <div id="cam">
+        <video id="aroll" class="clip" src="assets/aroll.mp4" data-start="0" data-duration="{{DUR}}" data-track-index="0" muted playsinline></video>
+      </div>
+      {{BROLL}}
+
+      <div id="circ-bg" class="clip" data-start="38.50" data-duration="4.46" data-track-index="7"></div>
+      <video id="b4_circle" class="clip" src="assets/broll/b4_circle_doc.mp4" data-start="38.50" data-duration="4.46" data-track-index="8" muted playsinline></video>
+      <div id="circ-wrap" class="clip" data-start="38.50" data-duration="4.46" data-track-index="9"><svg id="circ-ring" viewBox="0 0 1080 1920"><circle id="ringc" cx="540" cy="768" r="424" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
+
+      <div id="scrim"></div>
+      <div id="neg"></div>
+
+      {{BLOCKS}}
+
+      {{PLATES}}
+
+      {{NOTES}}
+
+      <div id="ctx" class="clip" data-start="38.52" data-duration="4.80" data-track-index="61">
+        <div id="ctx-in">
+          <div class="c-w"><span class="w" id="cx0">har</span> <span class="w" id="cx1">doim</span> <span class="w" id="cx2">birinchi</span> <span class="w" id="cx3">storis</span></div>
+          <div class="c-h" data-layout-allow-overlap><span id="cxh" data-layout-allow-overlap>ikkinchisini sotadi</span></div>
+          <div class="c-w"><span class="w" id="cx4">xizmat</span> <span class="w" id="cx5">qilishi</span> <span class="w" id="cx6">kerak</span></div>
+        </div>
+      </div>
+
+      <div id="cta" class="clip" data-start="47.30" data-duration="2.28" data-track-index="62">
+        <div class="pill" id="pill"><span class="pill-fill" id="pfill"></span><img src="assets/img/ig_avatar.jpg" alt="" />
+          <span class="pill-t"><span id="pt1">@dilafruz_yakubovnaa<svg class="ver" viewBox="0 0 24 24"><path d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z" fill="#3897f0"/><path d="M7.6 12.3l3 3 5.8-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="pt2">Izohga «+» yozing</span></span>
+          <span class="pill-ok" id="pok"><svg viewBox="0 0 24 24"><path class="draw" pathLength="1" d="M5 12.5l4.5 4.5L19 7.5" style="stroke:#ff7a1a;stroke-width:3"/></svg></span>
+        </div>
+      </div>
+
+      <div id="white" class="clip" data-start="49.62" data-duration="5.58" data-track-index="63"></div>
+      <div id="endcard" class="clip" data-start="49.62" data-duration="5.58" data-track-index="64">
+        <div class="ec-card" id="ecc"><img src="assets/img/thumb_hero.jpg" alt="" /><div class="ec-shade"></div>
+          <div class="ec-t"><div class="ec-k" id="eck">AHVOLNI KO‘TARUVCHI</div><div class="ec-b" id="ecb">20 TA USUL</div></div></div>
+        <div class="ec-row"><span class="ec-s" id="ecs">Sovg‘a!</span><span class="ec-pill" id="ecp"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="#fff"/></svg>video dars</span></div>
+      </div>
+
+      {{AUDIO}}
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: {{DUR}} }, 0);
+      // birinchi kadr oq-qora (namunadagidek), kesimda rangga
+      tl.set("#aroll", { filter: "grayscale(1) contrast(1.12) brightness(1.02)" }, 0);
+      tl.set("#aroll", { filter: "grayscale(0) contrast(1) brightness(1)" }, 6.68);
+
+      {{TIMELINE}}
+
+
+      // doira-niqob B-roll
+      tl.fromTo("#b4_circle", { clipPath: "circle(0% at 50% 40%)" }, { clipPath: "circle(22% at 50% 40%)", duration: 0.8, ease: "expo.out" }, 38.50);
+      tl.fromTo("#ringc", { strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 38.62);
+      [["#cx0", 38.74], ["#cx1", 39.14], ["#cx2", 39.54], ["#cx3", 40.18], ["#cx4", 41.70], ["#cx5", 42.14], ["#cx6", 42.52]].forEach(([id, t]) =>
+        tl.fromTo(id, { opacity: 0, y: 14, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, t - 0.08));
+      tl.fromTo("#cxh", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.0, ease: "power2.inOut" }, 40.62);
+      // 3D chiqish: blok og'ib, pastga tushib, kesimdan o'tib "to'kiladi"
+      tl.set("#ctx", { perspective: 900 }, 38.52);
+      tl.to("#ctx-in", { rotationX: 35, rotationZ: 12, y: 260, opacity: 0, filter: "blur(10px)", duration: 0.65, ease: "power2.inOut" }, 42.66);
+
+      // CTA pill: oq -> to'q-sariq to'ladi + ✓
+      tl.fromTo("#pill", { opacity: 0, x: -30, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.65, ease: "expo.out" }, 47.30);
+      tl.fromTo("#pfill", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "expo.out" }, 48.36);
+      tl.to("#pt1", { opacity: 0, filter: "blur(4px)", duration: 0.35, ease: "power2.inOut" }, 48.40);
+      tl.fromTo("#pt2", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 48.56);
+      tl.fromTo("#pok", { opacity: 0, scale: 0.85, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 48.86);
+      tl.fromTo("#pok .draw", { strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: 1, duration: 0.45, ease: "power2.inOut" }, 48.96);
+      tl.to("#pill", { opacity: 0, y: -12, filter: "blur(8px)", duration: 0.45, ease: "power2.inOut" }, 49.12);
+
+      // oq yakun ekran: karta kichikdan kattalashadi, yozuvlar so'zma-so'z
+      tl.fromTo("#ecc", { scale: 0.6, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.9, ease: "expo.out" }, 49.66);
+      tl.fromTo("#eck", { opacity: 0, y: 14, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 50.22);
+      tl.fromTo("#ecb", { opacity: 0, scaleX: 1.3, filter: "blur(16px)" }, { opacity: 1, scaleX: 1, filter: "blur(0px)", duration: 0.75, ease: "expo.out" }, 51.80);
+      tl.fromTo("#ecs", { opacity: 0, y: 16, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 52.40);
+      tl.fromTo("#ecp", { opacity: 0, scale: 0.85, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 52.90);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

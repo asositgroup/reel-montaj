@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Ucan Visa v2</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Urbanist"; src: url("assets/fonts/Urbanist-700.ttf"); font-weight: 700; font-style: normal; }
+      @font-face { font-family: "Urbanist"; src: url("assets/fonts/Urbanist-800.ttf"); font-weight: 800; font-style: normal; }
+      @font-face { font-family: "Urbanist"; src: url("assets/fonts/Urbanist-900.ttf"); font-weight: 900; font-style: normal; }
+      @font-face { font-family: "Urbanist"; src: url("assets/fonts/Urbanist-400i.ttf"); font-weight: 400; font-style: italic; }
+      @font-face { font-family: "Urbanist"; src: url("assets/fonts/Urbanist-800i.ttf"); font-weight: 800; font-style: italic; }
+      @font-face { font-family: "Urbanist"; src: url("assets/fonts/Urbanist-900i.ttf"); font-weight: 900; font-style: italic; }
+      @font-face { font-family: "Unbounded"; src: url("assets/fonts/Unbounded-800.ttf"); font-weight: 800; font-style: normal; }
+      @font-face { font-family: "Unbounded"; src: url("assets/fonts/Unbounded-900.ttf"); font-weight: 900; font-style: normal; }
+      @font-face { font-family: "Hanken Grotesk"; src: url("assets/fonts/HankenGrotesk-700.ttf"); font-weight: 700; font-style: normal; }
+      @font-face { font-family: "Hanken Grotesk"; src: url("assets/fonts/HankenGrotesk-800.ttf"); font-weight: 800; font-style: normal; }
+      @font-face { font-family: "Inter Tight"; src: url("assets/fonts/InterTight-500.ttf"); font-weight: 500; font-style: normal; }
+      @font-face { font-family: "Inter Tight"; src: url("assets/fonts/InterTight-600.ttf"); font-weight: 600; font-style: normal; }
+      @font-face { font-family: "Inter Tight"; src: url("assets/fonts/InterTight-800.ttf"); font-weight: 800; font-style: normal; }
+
+      :root { --cream: #f9f0da; --ink: #ffffff; --gold: #d4a26c; --gold2: #f0cf9f; --yel: #ffc400; --blk: #111111; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #111; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #111; }
+      #cam { position: absolute; inset: 0; transform-origin: 50% 34%; }
+      #aroll, #subject { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 900px; pointer-events: none;
+        background: linear-gradient(180deg, rgba(10,10,12,0) 0%, rgba(10,10,12,.3) 45%, rgba(10,10,12,.62) 100%); }
+      #dim { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(18,16,14,.6), rgba(8,8,8,.92)); opacity: 0; }
+      .w { display: inline-block; }
+
+      /* 11: bosh ortidagi bob raqami — kontur "10" + qalin italic YIL */
+      #bigword { position: absolute; left: 0; right: 0; top: 330px; height: 330px; display: flex; justify-content: center; }
+      #bigword .bw { display: flex; align-items: baseline; gap: 26px; }
+      #bigword .o { font: italic 900 330px/1 "Urbanist", sans-serif; letter-spacing: -0.04em; color: rgba(249,240,218,.16); -webkit-text-stroke: 5px var(--cream); }
+      #bigword .s { font: italic 900 190px/1 "Urbanist", sans-serif; letter-spacing: -0.03em; color: var(--gold2); text-shadow: 0 10px 40px rgba(0,0,0,.25); }
+
+      /* 11: oq plashka aylanib kiradi */
+      #plate { position: absolute; left: 0; right: 0; top: 960px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+      .pl { padding: 20px 46px 24px; border-radius: 28px; background: #fff; box-shadow: 0 24px 60px rgba(0,0,0,.4);
+        font: italic 900 92px/1.14 "Urbanist", sans-serif; color: var(--blk); letter-spacing: -0.03em; }
+      .pl-sub { display: flex; gap: .26em; font: italic 800 70px/1.2 "Urbanist", sans-serif; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.45), 0 4px 22px rgba(0,0,0,.6); }
+      .pl-sub .g { color: var(--gold2); }
+
+      /* kinetik sarlavhalar: ingichka italic + og'ir (11) */
+      .head { position: absolute; left: 84px; right: 84px; bottom: 300px; }
+      .head-in { display: flex; flex-direction: column; gap: 14px; }
+      .row { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.24em; }
+      .row.thin { font: italic 400 66px/1.2 "Urbanist", sans-serif; color: #fff; letter-spacing: -0.01em; }
+      .row.heavy { font: 900 126px/1.14 "Urbanist", sans-serif; color: #fff; letter-spacing: -0.035em; text-transform: uppercase; }
+      .row.boldit { font: italic 800 86px/1.18 "Urbanist", sans-serif; color: #fff; letter-spacing: -0.025em; }
+      .head .row { text-shadow: 0 4px 24px rgba(0,0,0,.45); }
+      .head .g { color: var(--gold2); }
+      .head .num { font: italic 900 230px/1 "Urbanist", sans-serif; color: rgba(249,240,218,.16); -webkit-text-stroke: 4px var(--cream); letter-spacing: -0.04em; text-shadow: none; }
+
+      /* subtitr (B oila) */
+      .cap { position: absolute; left: 60px; right: 60px; top: 1226px; text-align: center; font: 800 52px/1.2 "Urbanist", sans-serif; color: #fff;
+        letter-spacing: -0.01em; text-shadow: 0 3px 16px rgba(0,0,0,.6); }
+      .cap.low { top: 1500px; } .cap.bot { top: 1650px; }
+
+      /* 11: liquid-fill "1 200+" */
+      #num { position: absolute; left: 0; right: 0; top: 1130px; display: flex; flex-direction: column; align-items: center; }
+      .lq { display: grid; }
+      .lq > div { grid-area: 1 / 1; font: 900 260px/1.14 "Urbanist", sans-serif; letter-spacing: -0.04em; white-space: nowrap; text-align: center; }
+      .lq-base { color: rgba(249,240,218,.16); -webkit-text-stroke: 4px var(--cream); text-shadow: 0 8px 34px rgba(0,0,0,.55); }
+      .lq-fill { filter: drop-shadow(0 0 2px rgba(60,35,10,.9)); }
+      .lq-fill { color: var(--gold); background: linear-gradient(180deg, #f6d9a8, #d4a26c 45%, #a8733f); -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='900'><path d='M0 450 C50 420 150 420 200 450 S350 480 400 450 V900 H0 Z' fill='black'/></svg>");
+        mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='900'><path d='M0 450 C50 420 150 420 200 450 S350 480 400 450 V900 H0 Z' fill='black'/></svg>");
+        -webkit-mask-size: 400px 900px; mask-size: 400px 900px; -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x; -webkit-mask-position: 0px 0px; mask-position: 0px 0px; }
+      #num .sub { margin-top: 6px; display: flex; gap: .26em; font: italic 800 62px/1.2 "Urbanist", sans-serif; color: #fff; text-shadow: 0 3px 18px rgba(0,0,0,.5); }
+      #num .pill { margin-top: 26px; display: flex; align-items: center; gap: 16px; padding: 16px 30px; border-radius: 22px; background: #fff;
+        font: 800 40px/1 "Hanken Grotesk", sans-serif; color: var(--blk); letter-spacing: -0.02em; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+      .flag { width: 60px; height: 30px; border-radius: 4px; overflow: hidden; flex: none; }
+      #num .ok { margin-top: 20px; font: 700 38px/1 "Urbanist", sans-serif; color: var(--gold2); display: flex; gap: 12px; align-items: center; text-shadow: 0 3px 14px rgba(0,0,0,.5); }
+      #num .ok svg { width: 42px; height: 42px; }
+      .draw { fill: none; stroke: var(--gold2); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+      /* 15: doimiy tepa sarlavha (suzadi) */
+      #stage { position: absolute; inset: 0; }
+      #bhead { position: absolute; left: 0; right: 0; top: 280px; display: flex; justify-content: center; }
+      .bh { padding: 24px 50px 26px; border-radius: 34px; background: #fff; box-shadow: 0 22px 56px rgba(0,0,0,.45); text-align: center; }
+      .bh b { display: block; font: 800 66px/1.14 "Hanken Grotesk", sans-serif; color: var(--blk); letter-spacing: -0.05em; }
+      .bh span { display: block; margin-top: 6px; font: 700 30px/1.2 "Hanken Grotesk", sans-serif; color: #8e5f2e; letter-spacing: .06em; }
+
+      /* 14: 3D karusel */
+      #car { position: absolute; left: 0; right: 0; top: 600px; height: 700px; perspective: 1800px; }
+      .pc { position: absolute; left: 50%; top: 0; width: 420px; height: 560px; margin-left: -210px; border-radius: 36px; overflow: hidden;
+        background: #1a1a1c; box-shadow: 0 30px 70px rgba(0,0,0,.55), 0 0 0 3px rgba(255,255,255,.4); }
+      .pc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .pn { position: absolute; left: 0; right: 0; bottom: 0; padding: 70px 20px 26px; text-align: center; font: 800 32px/1.1 "Hanken Grotesk", sans-serif; color: #fff;
+        background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.82)); letter-spacing: -0.01em; }
+
+      /* 15: logotip plitkalari tokchada */
+      #logos { position: absolute; left: 0; right: 0; top: 640px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+      .lrow { display: flex; gap: 22px; }
+      .lt { width: 200px; height: 200px; border-radius: 56px; display: flex; align-items: center; justify-content: center; padding: 30px; flex: none;
+        box-shadow: 0 18px 40px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.35); }
+      .lt.light { background: linear-gradient(180deg, #ffffff, #ece8e0); } .lt.dark { background: linear-gradient(180deg, #25262a, #141518); border: 1.5px solid rgba(255,255,255,.16); }
+      .lt img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+      /* 12: pop-art sariq skotch yorliqlar */
+      #tapes { position: absolute; left: 0; right: 0; top: 1170px; display: flex; flex-direction: column; align-items: center; gap: 30px; }
+      .tape { position: relative; padding: 12px 36px 16px; border: 5px solid var(--blk); box-shadow: 11px 11px 0 var(--blk);
+        background: radial-gradient(rgba(150,80,0,.22) 1.8px, transparent 2.4px) 0 0 / 12px 12px, var(--yel);
+        font: 800 84px/1.14 "Unbounded", sans-serif; color: var(--blk); text-transform: uppercase; letter-spacing: -0.02em; white-space: nowrap; }
+      .tape.md { font-size: 62px; }
+      .tape.wh { background: #fff; font: 800 46px/1.14 "Unbounded", sans-serif; text-transform: none; display: flex; gap: 16px; align-items: center; }
+      .tape.wh svg { width: 48px; height: 48px; }
+      .tag { position: absolute; right: -60px; bottom: -44px; padding: 8px 22px; background: var(--blk); color: #fff; font: italic 800 44px/1.14 "Urbanist", sans-serif;
+        border-radius: 8px; text-transform: none; letter-spacing: 0; box-shadow: none; }
+      .burst { position: absolute; left: 50%; top: 382px; width: 900px; height: 450px; margin: -225px 0 0 -450px; }
+
+      /* 14: 3D brend nishoni */
+      #badge { position: absolute; left: 0; right: 0; top: 1150px; height: 520px; perspective: 1400px; display: flex; flex-direction: column; align-items: center; gap: 34px; }
+      .bd { position: relative; width: 820px; height: 280px; border-radius: 48px; background: #fbfaf7; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+        display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      .bd-logo { display: flex; align-items: center; height: 150px; }
+      .bd-logo img { height: 150px; display: block; }
+      .bd-sh { position: absolute; top: -40px; bottom: -40px; left: 0; width: 180px; background: linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.85), rgba(255,255,255,0)); }
+      .ln-pill { display: flex; align-items: center; gap: 14px; padding: 16px 32px; border-radius: 40px; background: #16171a; color: var(--cream);
+        font: 800 38px/1 "Hanken Grotesk", sans-serif; letter-spacing: -0.01em; box-shadow: 0 16px 40px rgba(0,0,0,.4); }
+      .ln-dot { width: 18px; height: 18px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 14px #3ddc84; }
+
+      /* 15 sarlavha + 13 rangli kartalar */
+      #cathead { position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; }
+      .ch { padding: 24px 44px; border-radius: 30px; background: #fff; box-shadow: 0 20px 50px rgba(0,0,0,.35); display: flex; align-items: center; gap: 26px; }
+      .ch .flag { width: 96px; height: 48px; border-radius: 8px; }
+      .ch b { display: block; font: 700 36px/1.1 "Hanken Grotesk", sans-serif; color: #5b5750; }
+      .ch span { font: 800 70px/1.1 "Hanken Grotesk", sans-serif; color: var(--blk); letter-spacing: -0.05em; }
+      #cards { position: absolute; left: 0; right: 0; top: 1110px; display: flex; justify-content: center; gap: 24px; }
+      .cd { width: 300px; height: 430px; border-radius: 38px; padding: 34px 26px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;
+        box-shadow: 0 26px 60px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.3); }
+      .cd .ic { width: 124px; height: 124px; border-radius: 34px; background: rgba(255,255,255,.95); display: flex; align-items: center; justify-content: center; }
+      .cd .ic svg { width: 76px; height: 76px; }
+      .cd b { display: block; font: 800 50px/1.14 "Inter Tight", sans-serif; color: #fff; letter-spacing: -0.045em; text-transform: uppercase; }
+      .cd span { display: block; margin-top: 8px; font: 600 28px/1.2 "Inter Tight", sans-serif; color: rgba(255,255,255,.86); }
+      #c0 { background: linear-gradient(160deg, #3d8bf0, #1f5fc4); } #c1 { background: linear-gradient(160deg, #b8844c, #7d5226); } #c2 { background: linear-gradient(160deg, #2cb57c, #15784f); }
+
+      /* 16: 3D-stiker "TAYYOR" */
+      #ready { position: absolute; left: 0; right: 0; top: 1110px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+      .rd-pl { padding: 12px 30px 14px; border-radius: 14px; background: var(--blk); color: var(--gold2); font: 800 42px/1.14 "Hanken Grotesk", sans-serif; letter-spacing: .02em;
+        box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+      .rd-it { font: italic 800 80px/1.18 "Urbanist", sans-serif; color: #fff; letter-spacing: -0.02em; text-shadow: 0 4px 22px rgba(0,0,0,.5); }
+      .stk { display: flex; gap: 4px; }
+      .stk span { display: block; font: 900 164px/1.14 "Unbounded", sans-serif; color: #fff; -webkit-text-stroke: 7px var(--blk); paint-order: stroke fill;
+        text-shadow: 2px 2px 0 #b98549, 4px 4px 0 #b98549, 6px 6px 0 #a8733f, 8px 8px 0 #a8733f, 10px 10px 0 #8e5f2e, 12px 12px 0 #8e5f2e, 14px 14px 0 #111, 22px 26px 30px rgba(0,0,0,.45); }
+
+      /* CTA (11/13/15) */
+      #cta { position: absolute; left: 0; right: 0; top: 1230px; display: flex; flex-direction: column; align-items: center; gap: 30px; }
+      .cc { position: relative; width: 900px; padding: 28px 30px; border-radius: 44px; background: #fff; box-shadow: 0 28px 70px rgba(0,0,0,.45); display: flex; align-items: center; gap: 26px; }
+      .av { width: 128px; height: 128px; border-radius: 50%; background: var(--yel); display: flex; align-items: center; justify-content: center; flex: none; border: 5px solid var(--blk); }
+      .av img { height: 66px; display: block; }
+      .cc-t { flex: 1; }
+      .cc-t b { display: flex; align-items: center; gap: 10px; font: 800 56px/1.1 "Hanken Grotesk", sans-serif; color: var(--blk); letter-spacing: -0.04em; }
+      .cc-t b svg { width: 40px; height: 40px; }
+      .cc-t span { display: block; margin-top: 6px; font: 700 30px/1.2 "Hanken Grotesk", sans-serif; color: #7a7266; }
+      .btn { display: grid; flex: none; }
+      .btn > div { grid-area: 1 / 1; padding: 22px 34px; border-radius: 28px; font: 800 40px/1 "Hanken Grotesk", sans-serif; text-align: center; letter-spacing: -0.02em; }
+      #b-ob { background: var(--yel); color: var(--blk); border: 4px solid var(--blk); }
+      #b-rh { background: var(--blk); color: var(--gold2); border: 4px solid var(--blk); }
+      #cursor { position: absolute; left: 0; top: 0; width: 70px; height: 70px; }
+      .cta-tag { display: flex; gap: .26em; font: italic 800 60px/1.2 "Urbanist", sans-serif; color: #fff; text-shadow: 0 4px 22px rgba(0,0,0,.5); }
+      .cta-tag .g { color: var(--gold2); }
+      .fx { position: absolute; inset: 0; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{DUR}}" data-width="1080" data-height="1920">
+      <svg width="0" height="0" style="position:absolute"><defs>
+        <symbol id="uk" viewBox="0 0 60 30"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#C8102E" stroke-width="2.4"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></symbol>
+      </defs></svg>
+      <div id="cam">
+        <video id="aroll" class="clip" src="assets/aroll.mp4" data-start="0" data-duration="{{DUR}}" data-track-index="0" muted playsinline></video>
+        <div id="bigword" class="clip" data-start="1.10" data-duration="2.70" data-track-index="1"><div class="bw"><span class="o">10</span><span class="s">YIL</span></div></div>
+        <video id="subject" class="clip" src="assets/subject_hook.webm" data-start="1.00" data-duration="2.80" data-track-index="2" muted playsinline></video>
+      </div>
+      <div id="dim"></div>
+      <div id="scrim"></div>
+
+      <div id="plate" class="clip" data-start="0.00" data-duration="2.62" data-track-index="29">
+        <div class="pl" id="pl">Ucan Consulting</div>
+        <div class="pl-sub"><span class="w" id="ps0">qariyb</span><span class="w g" id="ps1">10</span><span class="w" id="ps2">yildan</span><span class="w" id="ps3">beri</span></div>
+      </div>
+
+      {{CAPS}}
+      {{HEADS}}
+
+      <div id="num" class="clip" data-start="9.10" data-duration="4.95" data-track-index="31">
+        <div class="lq"><div class="lq-base" id="lq-b">0</div><div class="lq-fill" id="lq-f">0</div></div>
+        <div class="sub"><span class="w" id="ns0">nafardan</span><span class="w" id="ns1">ziyod</span><span class="w" id="ns2">insonlarga</span></div>
+        <div class="pill" id="n-pill"><svg class="flag"><use href="#uk"/></svg>Buyuk Britaniya vizasi</div>
+        <div class="ok" id="n-ok"><svg viewBox="0 0 24 24"><path class="draw" pathLength="1" d="M4 12.5l5 5L20 6.5"/></svg>olishda ko‘maklashdik</div>
+      </div>
+
+      <div id="stage" class="clip" data-start="14.75" data-duration="7.10" data-track-index="32">
+        <div id="car">{{PEOPLE}}</div>
+        <div id="logos">{{LOGOS}}</div>
+        <div id="bhead"><div class="bh" id="bh"><b>Bizga ishonganlar</b><span id="bh-s">TANIQLI INSONLAR VA TASHKILOTLAR</span></div></div>
+      </div>
+
+      <div id="tapes" class="clip" data-start="22.40" data-duration="3.90" data-track-index="33">
+        <svg class="burst" id="burst" viewBox="-260 -130 520 260"><path d="{{BURST}}" fill="#ff4a2e" stroke="#111" stroke-width="5" stroke-linejoin="round"/></svg>
+        <div class="tape" id="tp0">Alohida</div>
+        <div class="tape" id="tp1" style="z-index:2" data-layout-allow-overlap>Yo‘nalish<div class="tag" id="tp1t" data-layout-allow-overlap>sifatida</div></div>
+        <div class="tape md" id="tp2" data-layout-allow-overlap>Viza xizmatlari</div>
+        <div class="tape wh" id="tp3"><svg viewBox="0 0 24 24"><path class="draw" id="tp3d" pathLength="1" d="M4 12.5l5 5L20 6.5" style="stroke:#111;stroke-width:3.2"/></svg>yo‘lga qo‘ydik</div>
+      </div>
+
+      <div id="badge" class="clip" data-start="26.70" data-duration="2.60" data-track-index="34">
+        <div class="bd" id="bd"><div class="bd-logo"><img id="uvb" src="assets/logos/uv_bars.png" alt="" /><img id="uvt" src="assets/logos/uv_text.png" alt="" /></div><div class="bd-sh" id="bdsh"></div></div>
+        <div class="ln-pill" id="lpill"><span class="ln-dot"></span>Sahifa ishga tushdi</div>
+      </div>
+
+      <div id="cathead" class="clip" data-start="29.24" data-duration="4.30" data-track-index="35">
+        <div class="ch" id="chp"><svg class="flag"><use href="#uk"/></svg><div><b>Buyuk Britaniya</b><span>VIZASI</span></div></div>
+      </div>
+      <div id="cards" class="clip" data-start="29.80" data-duration="3.74" data-track-index="36">
+        <div class="cd" id="c0"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1f5fc4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5 3 11l1.5-1.5 7 1 4-4.5c1-1 2.6-1.3 3.3-.6.7.7.4 2.3-.6 3.3l-4.5 4 1 7L13 21l-2.5-7.5z"/><path d="M6 17l-2 .5.5-2 3-3"/></svg></div><div><b>Sayohat</b><span>sayyohlik vizasi</span></div></div>
+        <div class="cd" id="c1"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#9a6632" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.2V16c0 1.4 2.7 3 6 3s6-1.6 6-3v-4.8"/><path d="M22 9v6"/></svg></div><div><b>O‘qish</b><span>talaba vizasi</span></div></div>
+        <div class="cd" id="c2"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15784f" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg></div><div><b>Biznes</b><span>biznes vizasi</span></div></div>
+      </div>
+
+      <div id="ready" class="clip" data-start="35.40" data-duration="3.00" data-track-index="37">
+        <div class="rd-pl" id="rdp">UCAN VISA JAMOASI</div>
+        <div class="rd-it" id="rdi">xizmatingizga</div>
+        <div class="stk">{{STICK}}</div>
+      </div>
+
+      <div id="cta" class="clip" data-start="41.55" data-duration="4.05" data-track-index="38">
+        <div class="cc" id="cc">
+          <div class="av"><img src="assets/logos/uv_bars.png" alt="" /></div>
+          <div class="cc-t"><b>Ucan Visa<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#3b82f6"/><path d="M7 12.3l3.2 3.2L17 8.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></b><span>UK viza xizmatlari</span></div>
+          <div class="btn"><div id="b-ob">Obuna</div><div id="b-rh">Rahmat!</div></div>
+          <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2.5l15 10.2-6.6 1.3 3.9 7.3-3 1.5-3.8-7.4L4.8 20z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="cta-tag"><span class="w" id="ct0">Buyuk</span><span class="w" id="ct1">Britaniya</span><span class="w g" id="ct2">viza</span><span class="w" id="ct3">xizmatlarida.</span></div>
+      </div>
+
+      {{FX}}
+      {{AUDIO}}
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: {{DUR}} }, 0);
+      const IN = (sel, t, extra) => tl.fromTo(sel, { opacity: 0, y: 40, filter: "blur(12px)" }, Object.assign({ opacity: 1, y: 0, filter: "blur(0px)", duration: 0.62, ease: "expo.out" }, extra || {}), t - 0.08);
+      const OUT = (sel, t, extra) => tl.to(sel, Object.assign({ opacity: 0, y: -16, filter: "blur(8px)", duration: 0.4, ease: "power2.inOut" }, extra || {}), t);
+      {{TIMELINE}}
+
+      // 0-2.6: oq plashka aylanib kiradi (11), keyin to'g'rilanadi
+      tl.fromTo("#pl", { opacity: 0, scale: 0.35, rotation: -200, filter: "blur(14px)" }, { opacity: 1, scale: 1.06, rotation: 10.7, filter: "blur(0px)", duration: 0.75, ease: "expo.out" }, 0.0);
+      tl.to("#pl", { scale: 1, rotation: -2.5, duration: 0.9, ease: "sine.inOut" }, 0.76);
+      [["#ps0", 0.78], ["#ps1", 1.28], ["#ps2", 1.66], ["#ps3", 2.10]].forEach(([id, t]) => IN(id, t));
+      OUT("#plate > *", 2.2, { stagger: 0.04 });
+
+      // bosh ortidagi bob raqami
+      tl.fromTo("#bigword .o", { opacity: 0, y: 70, scale: 1.12, filter: "blur(16px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 1.20);
+      tl.fromTo("#bigword .s", { opacity: 0, x: 60, filter: "blur(14px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 1.58);
+      OUT("#bigword .bw", 3.35);
+
+      // 1 200+ liquid-fill (11) — drop 9.36 da
+      const lq = { v: 0, lv: 0, sx: 0 }, lqB = document.getElementById("lq-b"), lqF = document.getElementById("lq-f");
+      function lqDraw() {
+        const s = Math.round(lq.v).toLocaleString("en-US").replace(",", " ") + (lq.v >= 1199.5 ? "+" : "");
+        lqB.textContent = s; lqF.textContent = s;
+        const H = 296, y0 = (H - 420) * (1 - lq.lv) - 480 * lq.lv;
+        const p = `${(-lq.sx).toFixed(1)}px ${y0.toFixed(1)}px`; lqF.style.webkitMaskPosition = p; lqF.style.maskPosition = p;
+      }
+      lqDraw();
+      tl.fromTo(".lq", { opacity: 0, y: 60, scale: 1.08, filter: "blur(16px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 9.16);
+      tl.to(lq, { v: 1200, duration: 1.3, ease: "power2.out", onUpdate: lqDraw }, 9.36);
+      tl.to(lq, { lv: 1, duration: 2.2, ease: "power2.inOut", onUpdate: lqDraw }, 9.5);
+      tl.to(lq, { sx: 1200, duration: 4.3, ease: "none", onUpdate: lqDraw }, 9.5);
+      [["#ns0", 9.76], ["#ns1", 10.40], ["#ns2", 10.66]].forEach(([id, t]) => IN(id, t));
+      tl.fromTo("#n-pill", { opacity: 0, scale: 0.6, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.4)" }, 11.18);
+      IN("#n-ok", 13.02);
+      tl.fromTo("#n-ok .draw", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" }, 13.06);
+      OUT("#num > *", 13.62, { stagger: 0.04 });
+
+      // 14.75-21.85: fon xira; doimiy tepa sarlavha (15)
+      tl.to("#cam", { filter: "blur(16px) brightness(.5)", duration: 0.6, ease: "power2.inOut" }, 14.6);
+      tl.to("#dim", { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 14.6);
+      tl.to("#cam", { filter: "blur(0px) brightness(1)", duration: 0.6, ease: "power2.inOut" }, 21.3);
+      tl.to("#dim", { opacity: 0, duration: 0.6, ease: "power2.inOut" }, 21.3);
+      tl.fromTo("#bhead", { opacity: 0, y: -220, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 14.80);
+      tl.fromTo("#bh", { y: 0, rotation: 0 }, { y: -10, rotation: -1.2, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 4 }, 15.6);
+      OUT("#bhead", 21.25);
+
+      // 3D karusel (14): proxy k, sweep 19f + overshoot, settle 14f; aberratsiya kasr qismidan (seek-safe)
+      const cards = [...document.querySelectorAll(".pc")], car = { k: -1.6 };
+      function place() {
+        const fr = Math.abs(car.k - Math.round(car.k)), ab = Math.min(fr * 26, 9);
+        cards.forEach((c, i) => {
+          const d = i - car.k, ad = Math.abs(d);
+          gsap.set(c, { x: d * 300, z: -ad * 220, rotationY: Math.max(-58, Math.min(58, -d * 34)), scale: 1 - Math.min(ad, 3) * 0.06,
+            opacity: ad > 2.8 ? 0 : 1, zIndex: 100 - Math.round(ad * 10),
+            filter: `blur(${Math.min(ad * 2.2 + ab * 0.5, 9).toFixed(1)}px) drop-shadow(${ab.toFixed(1)}px 0 0 rgba(255,40,80,.55)) drop-shadow(${(-ab).toFixed(1)}px 0 0 rgba(0,210,255,.55))` });
+        });
+      }
+      place();
+      tl.fromTo("#car", { opacity: 0, scale: 1.12, filter: "blur(20px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 14.85);
+      [[14.90, 0.0], [15.80, 3.0], [16.64, 6.0]].forEach(([t, k]) => {
+        tl.to(car, { k: k + 0.28, duration: 0.5, ease: "power3.out", onUpdate: place }, t);
+        tl.to(car, { k, duration: 0.36, ease: "sine.inOut", onUpdate: place }, t + 0.5);
+      });
+      tl.to("#car", { opacity: 0, scale: 0.94, filter: "blur(12px)", duration: 0.4, ease: "power2.inOut" }, 17.36);
+
+      // logotip plitkalari (15): 0.4 -> 1.14 -> 1.0
+      const tiles = [...document.querySelectorAll(".lt")];
+      tiles.forEach((el, i) => {
+        const t = 17.62 + i * 0.1;
+        tl.fromTo(el, { opacity: 0, scale: 0.4, y: 30, filter: "blur(8px)" }, { opacity: 1, scale: 1.14, y: 0, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, t);
+        tl.to(el, { scale: 1, duration: 0.4, ease: "sine.inOut" }, t + 0.3);
+      });
+      tl.fromTo("#logos", { y: 0 }, { y: -14, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 18.9);
+      tl.to(tiles, { opacity: 0, scale: 0.8, filter: "blur(10px)", duration: 0.4, ease: "power2.inOut", stagger: { each: 0.02, from: "center" } }, 21.1);
+
+      // 12: sariq skotch yorliqlar + komiks burst
+      [["#tp0", 22.60, -4], ["#tp1", 23.12, 3], ["#tp2", 23.82, -2], ["#tp3", 25.28, 2]].forEach(([id, t, r]) =>
+        tl.fromTo(id, { opacity: 0, scale: 1.5, rotation: r + 10, filter: "blur(10px)" }, { opacity: 1, scale: 1, rotation: r, filter: "blur(0px)", duration: 0.5, ease: "back.out(1.4)" }, t - 0.1));
+      tl.fromTo("#tp1t", { opacity: 0, scale: 0.6, rotation: -14 }, { opacity: 1, scale: 1, rotation: -6, duration: 0.5, ease: "back.out(1.4)" }, 23.32);
+      tl.fromTo("#burst", { opacity: 0, scale: 0.3, rotation: -20 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.6)" }, 24.52);
+      tl.to("#burst", { rotation: 6, duration: 1.2, ease: "sine.inOut" }, 25.22);
+      tl.fromTo("#tp3d", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.inOut" }, 25.5);
+      tl.to(["#tp0", "#tp1", "#burst", "#tp2", "#tp3"], { opacity: 0, x: -140, filter: "blur(10px)", duration: 0.4, ease: "power2.in", stagger: 0.05 }, 25.86);
+
+      // 14: 3D brend nishoni uchib kiradi, yaltiraydi, kameradan o'tib ketadi
+      tl.fromTo("#bd", { opacity: 0, z: -2400, rotationY: -70, rotationX: 18, filter: "blur(18px)" }, { opacity: 1, z: 60, rotationY: 8, rotationX: -3, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 26.80);
+      tl.to("#bd", { z: 0, rotationY: 0, rotationX: 0, duration: 0.5, ease: "sine.inOut" }, 27.5);
+      tl.fromTo("#uvb", { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 0.6, ease: "power3.out" }, 27.0);
+      tl.fromTo("#uvt", { opacity: 0, x: -50, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.62, ease: "expo.out" }, 27.36);
+      tl.fromTo("#bdsh", { x: -260 }, { x: 1000, duration: 0.9, ease: "power2.inOut" }, 27.75);
+      tl.fromTo("#lpill", { opacity: 0, scale: 0.6, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.4)" }, 28.28);
+      tl.to("#bd", { z: 900, opacity: 0, filter: "blur(16px)", duration: 0.42, ease: "power2.in" }, 28.86);
+      OUT("#lpill", 28.86);
+
+      // 15 sarlavha + 13 kartalar: 10f expo.out overshoot ~130 px, 20f settle
+      tl.fromTo("#chp", { opacity: 0, y: -240, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 29.28);
+      tl.fromTo("#cathead", { y: 0 }, { y: -10, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 2 }, 30.1);
+      [["#c0", 30.06], ["#c1", 30.82], ["#c2", 31.66]].forEach(([id, t]) => {
+        tl.fromTo(id, { opacity: 0, x: 760, rotation: 8, filter: "blur(10px)" }, { opacity: 1, x: -130, rotation: -3, filter: "blur(0px)", duration: 0.42, ease: "expo.out" }, t - 0.14);
+        tl.to(id, { x: 0, rotation: 0, duration: 0.8, ease: "sine.inOut" }, t + 0.28);
+      });
+      tl.to(["#c0", "#c1", "#c2"], { opacity: 0, y: 60, filter: "blur(10px)", duration: 0.4, ease: "power2.inOut", stagger: 0.05 }, 33.08);
+      OUT("#chp", 33.12);
+
+      // 16: "TAYYOR" 3D-stiker harflari tasodifiy tartibda
+      tl.fromTo("#rdp", { opacity: 0, scale: 0.6, rotation: -10 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.5, ease: "back.out(1.4)" }, 35.48);
+      IN("#rdi", 36.86);
+      [3, 0, 5, 1, 4, 2].forEach((i, n) => {
+        const r = [-7, 5, -4, 8, -6, 4][i];
+        tl.fromTo("#sk" + i, { opacity: 0, scale: 0.6, y: -70, rotation: r * 3, filter: "blur(8px)" }, { opacity: 1, scale: 1, y: 0, rotation: r, filter: "blur(0px)", duration: 0.5, ease: "back.out(1.4)" }, 37.08 + n * 0.05);
+      });
+      OUT("#ready > *", 38.02, { stagger: 0.04 });
+
+      // CTA: karta + kursor "Obuna" -> "Rahmat!"
+      tl.fromTo("#cc", { opacity: 0, y: 160, scale: 0.92, filter: "blur(12px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.75, ease: "expo.out" }, 41.62);
+      tl.fromTo("#cursor", { opacity: 0, x: 900, y: 260 }, { opacity: 1, x: 760, y: 90, duration: 0.8, ease: "power3.out" }, 42.30);
+      tl.to("#cursor", { scale: 0.82, duration: 0.12, ease: "power2.in" }, 43.10);
+      tl.to("#cursor", { scale: 1, duration: 0.3, ease: "power2.out" }, 43.22);
+      tl.to("#b-ob", { opacity: 0, scale: 0.9, duration: 0.25, ease: "power2.inOut" }, 43.18);
+      tl.fromTo("#b-rh", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 43.20);
+      tl.to("#cursor", { opacity: 0, x: 880, y: 220, duration: 0.6, ease: "power2.inOut" }, 43.75);
+      [["#ct0", 43.42], ["#ct1", 43.78], ["#ct2", 44.26], ["#ct3", 45.08]].forEach(([id, t]) => IN(id, t));
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

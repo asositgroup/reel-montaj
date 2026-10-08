@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Storis Instagram dunyosi</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-var.ttf"); font-weight: 100 900; }
+      :root { --ig: linear-gradient(45deg, #feda75 0%, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5 100%); }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; font-family: "Inter", sans-serif; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; perspective: 1700px; }
+
+      /* sahna (jonli video) */
+      #cam { position: absolute; inset: 0; transform-origin: 50.2% 32.3%; backface-visibility: hidden; }
+      #aroll { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .cubeface { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; backface-visibility: hidden; }
+      #pipring { position: absolute; left: 576px; top: 1306px; width: 468px; height: 468px; border-radius: 50%; padding: 9px;
+        background: var(--ig); opacity: 0; box-shadow: 0 24px 60px rgba(0,0,0,.55); }
+      #pipring i { display: block; width: 100%; height: 100%; border-radius: 50%; background: #000; }
+
+      /* storis ramkasi */
+      #chrome { position: absolute; inset: 0; pointer-events: none; }
+      .shade-t { position: absolute; left: 0; right: 0; top: 0; height: 330px; background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,0)); }
+      .shade-b { position: absolute; left: 0; right: 0; bottom: 0; height: 420px; background: linear-gradient(0deg, rgba(0,0,0,.30), rgba(0,0,0,0)); }
+      .bars { position: absolute; left: 24px; right: 24px; top: 26px; display: flex; gap: 8px; }
+      .bars i { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.38); overflow: hidden; position: relative; }
+      .bars i b { position: absolute; inset: 0; background: #fff; border-radius: 3px; transform-origin: 0 50%; }
+      .hdr { position: absolute; left: 28px; right: 28px; top: 56px; display: flex; align-items: center; gap: 18px; color: #fff; }
+      .av { width: 76px; height: 76px; border-radius: 50%; padding: 4px; background: var(--ig); flex: none; }
+      .av img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #000; object-fit: cover; display: block; }
+      .hdr b { font-weight: 700; font-size: 34px; display: flex; align-items: center; gap: 8px; }
+      .ver { width: 30px; height: 30px; }
+      .hdr .tm { font-weight: 500; font-size: 30px; color: rgba(255,255,255,.75); }
+      .hdr .x { margin-left: auto; display: flex; gap: 34px; font-size: 44px; font-weight: 300; }
+
+      /* IG matn stikerlari */
+      .stk { position: absolute; left: 0; right: 0; display: flex; justify-content: center; }
+      .stk-in { display: flex; flex-direction: column; align-items: center; }
+      .ln { display: inline-block; padding: 10px 28px 15px; border-radius: 18px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.05;
+        margin-top: -6px; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+      .ln.blk { background: #000; color: #fff; font-size: 72px; }
+      .ln.wht { background: #fff; color: #000; font-size: 86px; }
+      .ln.grad { background: var(--ig); color: #fff; font-size: 108px; }
+      .ln.red { background: #ed4956; color: #fff; font-size: 74px; }
+
+      /* "ko'rishlar" paneli */
+      #views { position: absolute; left: 0; right: 0; bottom: 0; height: 760px; }
+      .sheet { position: absolute; inset: 0; border-radius: 44px 44px 0 0; background: #121212; color: #fff; padding: 26px 48px; box-shadow: 0 -20px 60px rgba(0,0,0,.45); }
+      .grab { width: 90px; height: 8px; border-radius: 4px; background: #3a3a3a; margin: 0 auto 34px; }
+      .vrow { display: flex; align-items: center; gap: 22px; }
+      .vrow svg { width: 70px; height: 70px; flex: none; }
+      .vnum { font-weight: 800; font-size: 150px; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+      .vlab { font-weight: 600; font-size: 36px; color: #a8a8a8; margin-top: 6px; }
+      .up { margin-left: auto; padding: 14px 24px; border-radius: 40px; background: rgba(46,204,113,.16); color: #3ddc84; font-weight: 800; font-size: 44px; }
+      .chart { display: flex; align-items: flex-end; gap: 14px; height: 210px; margin: 44px 0 30px; }
+      .chart i { flex: 1; border-radius: 10px 10px 4px 4px; background: #2b2b2b; transform-origin: 50% 100%; }
+      .chart i.hi { background: linear-gradient(180deg, #d62976, #962fbf); }
+      .avs { display: flex; align-items: center; }
+      .avs i { width: 64px; height: 64px; border-radius: 50%; border: 4px solid #121212; margin-left: -18px; background: linear-gradient(135deg,#6d6d6d,#3b3b3b); }
+      .avs i:first-child { margin-left: 0; }
+      .avs span { margin-left: 18px; font-size: 34px; color: #d0d0d0; font-weight: 500; }
+
+      /* qadam kartasi (IG savol stikeri) */
+      .step { position: absolute; left: 0; right: 0; display: flex; justify-content: center; }
+      .st-in { width: 780px; border-radius: 40px; overflow: hidden; background: #fff; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+      .st-h { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 22px; background: var(--ig); color: #fff; font-weight: 800; font-size: 40px; letter-spacing: .08em; }
+      .st-h img { width: 56px; height: 56px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; }
+      .st-b { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 34px 30px 40px; color: #000; font-weight: 800; font-size: 66px; letter-spacing: -0.03em; }
+      .st-e { display: inline-block; font-size: 76px; }
+
+      /* Direct */
+      .dm { position: absolute; inset: 0; background: #000; color: #fff; }
+      .dm-h { display: flex; align-items: center; gap: 22px; padding: 70px 40px 30px; border-bottom: 1px solid #262626; }
+      .dm-h .bk { font-size: 64px; font-weight: 300; }
+      .dm-h b { font-size: 40px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+      .dm-h .sub { font-size: 28px; color: #a8a8a8; }
+      .dm-h .pill { margin-left: auto; padding: 12px 22px; border-radius: 30px; background: #0095f6; font-weight: 700; font-size: 30px; }
+      .dm-h .av2 { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; }
+      .msgs { padding: 50px 40px; display: flex; flex-direction: column; gap: 26px; }
+      .m { display: flex; align-items: flex-end; gap: 18px; }
+      .m .a { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#7a7a7a,#3b3b3b); flex: none; }
+      .m .a.img { background: none; object-fit: cover; }
+      .m p { max-width: 720px; padding: 26px 34px; border-radius: 40px; background: #262626; font-size: 42px; line-height: 1.25; font-weight: 500; }
+      .typing p { display: flex; gap: 12px; padding: 30px 34px; }
+      .typing p i { width: 16px; height: 16px; border-radius: 50%; background: #9a9a9a; }
+      .seen { padding-left: 82px; font-size: 28px; color: #a8a8a8; }
+      .att { width: 700px; border-radius: 34px; overflow: hidden; background: #262626; }
+      .att .img { position: relative; height: 394px; }
+      .att .img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .att .play { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; background: rgba(0,0,0,.55);
+        display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+      .att .play svg { width: 54px; height: 54px; margin-left: 8px; }
+      .att .ttl { position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 28px 20px; background: linear-gradient(0deg, rgba(0,0,0,.85), rgba(0,0,0,0)); }
+      .att .ttl small { display: block; font-size: 28px; font-weight: 700; color: #ffb35c; letter-spacing: .04em; }
+      .att .ttl b { font-size: 64px; font-weight: 900; letter-spacing: -0.03em; }
+      .att .meta { padding: 22px 28px 26px; font-size: 32px; color: #c8c8c8; display: flex; justify-content: space-between; }
+      .att .meta b { color: #fff; }
+
+      /* savol qutisi */
+      #qbox { position: absolute; left: 0; right: 0; top: 980px; display: flex; justify-content: center; }
+      .qb-in { position: relative; width: 800px; border-radius: 40px; background: #fff; padding: 74px 40px 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+      .qb-in img { position: absolute; left: 50%; top: -56px; width: 112px; height: 112px; margin-left: -56px; border-radius: 50%; border: 6px solid #fff; object-fit: cover; }
+      .qb-t { font-weight: 800; font-size: 54px; line-height: 1.12; letter-spacing: -0.02em; color: #000; }
+      .qb-f { margin-top: 30px; border-radius: 26px; background: #efefef; padding: 26px 30px; font-size: 40px; font-weight: 500; color: #8e8e8e; text-align: left; display: grid; }
+      .qb-f > * { grid-area: 1 / 1; }
+      .qb-f .ty { color: #111; }
+      .qb-f .ty i { font-style: normal; opacity: 0; }
+
+      /* 3D storis karuseli */
+      #carou { position: absolute; left: 0; right: 0; top: 520px; height: 900px; perspective: 1600px; }
+      .sc { position: absolute; left: 330px; top: 0; width: 420px; height: 746px; border-radius: 36px; overflow: hidden; color: #fff; padding: 26px 28px;
+        box-shadow: 0 30px 70px rgba(0,0,0,.55); backface-visibility: hidden; }
+      .sc .pb { display: flex; gap: 6px; }
+      .sc .pb i { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.4); }
+      .sc .pb i.on { background: #fff; }
+      .sc .u { display: flex; align-items: center; gap: 12px; margin-top: 18px; font-weight: 700; font-size: 24px; }
+      .sc .u img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
+      .sc .n { margin-top: 70px; font-weight: 900; font-size: 150px; line-height: 1; letter-spacing: -0.05em; opacity: .95; }
+      .sc .k { margin-top: 6px; font-weight: 800; font-size: 34px; letter-spacing: .12em; opacity: .85; }
+      .sc .t { position: absolute; left: 28px; right: 28px; bottom: 44px; font-weight: 800; font-size: 46px; line-height: 1.12; letter-spacing: -0.02em; }
+      #sc0 { background: linear-gradient(160deg, #fa7e1e, #d62976); }
+      #sc1 { background: linear-gradient(160deg, #d62976, #962fbf); }
+      #sc2 { background: linear-gradient(160deg, #962fbf, #4f5bd5); }
+      #carlab { position: absolute; left: 0; right: 0; top: 1380px; display: flex; justify-content: center; }
+
+      /* izohlar oynasi */
+      #cmts { position: absolute; left: 0; right: 0; bottom: 0; height: 1020px; }
+      .cs { position: absolute; inset: 0; border-radius: 44px 44px 0 0; background: #121212; color: #fff; box-shadow: 0 -20px 60px rgba(0,0,0,.5); }
+      .cs .grab { margin: 26px auto 18px; }
+      .cs h4 { text-align: center; font-size: 38px; font-weight: 700; padding-bottom: 26px; border-bottom: 1px solid #262626; }
+      .crow { display: flex; align-items: flex-start; gap: 22px; padding: 26px 40px 6px; }
+      .crow .a { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg,#7a7a7a,#3b3b3b); flex: none; }
+      .crow .a.me { background: var(--ig); }
+      .crow .tx { flex: 1; font-size: 34px; line-height: 1.3; }
+      .crow .tx b { font-weight: 700; margin-right: 10px; }
+      .crow .tx span { color: #a8a8a8; font-size: 28px; }
+      .crow .tx em { font-style: normal; font-weight: 800; font-size: 46px; }
+      .crow svg { width: 38px; height: 38px; fill: none; stroke: #a8a8a8; stroke-width: 1.8; margin-top: 10px; }
+      .crow svg.red { fill: #ed4956; stroke: #ed4956; }
+      #newc { opacity: 0; }
+      .cin { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 40px 60px; border-top: 1px solid #262626; display: flex; align-items: center; gap: 22px; background: #121212; }
+      .cin .a { width: 76px; height: 76px; border-radius: 50%; background: var(--ig); flex: none; }
+      .cin .f { flex: 1; height: 86px; border-radius: 43px; border: 2px solid #363636; display: grid; align-items: center; padding: 0 30px; font-size: 36px; }
+      .cin .f > * { grid-area: 1 / 1; }
+      .cin .ph { color: #8e8e8e; }
+      .cin .pl { color: #fff; font-weight: 800; font-size: 50px; opacity: 0; }
+      .cin .post { color: #0095f6; font-weight: 700; font-size: 36px; opacity: .35; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{DUR}}" data-width="1080" data-height="1920">
+      <!-- Direct qatlamlari (sahna ortida; spiker PiP bo'lganda ochiladi) -->
+      <div id="dm1" class="clip dm" data-start="17.15" data-duration="5.10" data-track-index="1">
+        <div class="dm-h"><span class="bk">‹</span><div><b>Direct</b><div class="sub">32 ta yangi xabar</div></div><span class="pill">Hammasini o‘qish</span></div>
+        <div class="msgs">
+          <div class="m" id="dm1a"><i class="a"></i><p>Storislarim ko‘rilmay qoldi, nima qilay? 😔</p></div>
+          <div class="m" id="dm1b"><i class="a"></i><p>Obunachi bor, lekin hech kim yozmaydi</p></div>
+          <div class="m" id="dm1c"><i class="a"></i><p>Nimadan boshlashni bilmayapman…</p></div>
+          <div class="m typing" id="dm1d"><i class="a"></i><p><i></i><i></i><i></i></p></div>
+          <div class="seen" id="dm1s">Ko‘rildi</div>
+        </div>
+      </div>
+      <div id="dm2" class="clip dm" data-start="49.60" data-duration="5.60" data-track-index="2">
+        <div class="dm-h"><span class="bk">‹</span><img class="av2" src="assets/img/ig_avatar.jpg" alt="" /><div><b>dilafruz_yakubovnaa{{VER}}</b><div class="sub">faol</div></div></div>
+        <div class="msgs">
+          <div class="m" id="dm2a"><img class="a img" src="assets/img/ig_avatar.jpg" alt="" /><p>Sovg‘am sizga 🎁</p></div>
+          <div class="m" id="dm2b"><img class="a img" src="assets/img/ig_avatar.jpg" alt="" />
+            <div class="att"><div class="img"><img src="assets/img/thumb_hero.jpg" alt="" />
+              <div class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="#fff"/></svg></div>
+              <div class="ttl"><small>AHVOLNI KO‘TARUVCHI</small><b id="dm2t">20 ta usul</b></div></div>
+              <div class="meta"><span><b>Video dars</b> · bepul</span><span>12:40</span></div></div></div>
+          <div class="seen" id="dm2s">Yuborildi ✓</div>
+        </div>
+      </div>
+
+      <div id="pipring"><i></i></div>
+      <div id="cam">
+        <video id="aroll" class="clip" src="assets/aroll.mp4" data-start="0" data-duration="{{DUR}}" data-track-index="0" muted playsinline></video>
+      </div>
+      {{CUBE}}
+
+      <div id="chrome">
+        <div class="shade-t"></div><div class="shade-b"></div>
+        <div class="bars"><i><b id="pb0"></b></i><i><b id="pb1"></b></i><i><b id="pb2"></b></i><i><b id="pb3"></b></i><i><b id="pb4"></b></i><i><b id="pb5"></b></i></div>
+        <div class="hdr"><div class="av"><img src="assets/img/ig_avatar.jpg" alt="" /></div><b>dilafruz_yakubovnaa{{VER}}</b><span class="tm">2 soat</span><div class="x"><span>⋯</span><span>✕</span></div></div>
+      </div>
+
+      {{STICKERS}}
+
+      {{STEPS}}
+
+      <div id="views" class="clip" data-start="3.62" data-duration="3.05" data-track-index="60">
+        <div class="sheet" id="vsheet"><div class="grab"></div>
+          <div class="vrow">{{EYE}}<div><div class="vnum" id="vnum">5 000</div><div class="vlab">storis ko‘rishlari</div></div><div class="up" id="vx">×5</div></div>
+          <div class="chart"><i style="height:18%"></i><i style="height:22%"></i><i style="height:20%"></i><i style="height:35%"></i><i style="height:52%" class="hi"></i><i style="height:70%" class="hi"></i><i style="height:100%" class="hi"></i></div>
+          <div class="avs"><i></i><i></i><i></i><i></i><span>5 000 dan → 25 000 gacha</span></div>
+        </div>
+      </div>
+
+      <div id="qbox" class="clip" data-start="22.48" data-duration="4.10" data-track-index="61">
+        <div class="qb-in" id="qbin"><img src="assets/img/ig_avatar.jpg" alt="" />
+          <div class="qb-t">Qaysi muammo bilan<br>murojaat qilyapsiz?</div>
+          <div class="qb-f"><span class="ph" id="qph">Javob yozing…</span><span class="ty" id="qty"></span></div>
+        </div>
+      </div>
+
+      <div id="carou" class="clip" data-start="38.50" data-duration="4.44" data-track-index="62">
+        <div class="sc" id="sc0"><div class="pb"><i class="on"></i><i></i><i></i></div><div class="u"><img src="assets/img/ig_avatar.jpg" alt="" />dilafruz_yakubovnaa</div>
+          <div class="n">1</div><div class="k">HUK</div><div class="t">Bu haqida hech kim gapirmaydi…</div></div>
+        <div class="sc" id="sc1"><div class="pb"><i class="on"></i><i class="on"></i><i></i></div><div class="u"><img src="assets/img/ig_avatar.jpg" alt="" />dilafruz_yakubovnaa</div>
+          <div class="n">2</div><div class="k">QIZIQISH</div><div class="t">Davomi keyingi storisda 👉</div></div>
+        <div class="sc" id="sc2"><div class="pb"><i class="on"></i><i class="on"></i><i class="on"></i></div><div class="u"><img src="assets/img/ig_avatar.jpg" alt="" />dilafruz_yakubovnaa</div>
+          <div class="n">3</div><div class="k">TAKLIF</div><div class="t">Izohga «+» yozing ✍️</div></div>
+      </div>
+      <div id="carlab" class="clip stk" data-start="41.60" data-duration="1.34" data-track-index="63"><div class="stk-in" style="transform:rotate(-2deg)"><span class="ln wht" id="carl">har biri keyingisini sotadi</span></div></div>
+
+      <div id="cmts" class="clip" data-start="46.60" data-duration="3.00" data-track-index="64">
+        <div class="cs" id="csheet"><div class="grab"></div><h4>Izohlar</h4>
+          <div class="crow" id="newc"><i class="a me"></i><div class="tx"><b>siz</b><span>hozir</span><br><em>+</em></div><svg class="red" id="newh" viewBox="0 0 24 24"><path d="M12 21.3 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.3z"/></svg></div>
+          <div class="crow"><i class="a"></i><div class="tx"><b>m*****a</b><span>2 daq</span><br><em>+</em></div>{{HEART}}</div>
+          <div class="crow"><i class="a"></i><div class="tx"><b>s*****r</b><span>5 daq</span><br><em>+</em></div>{{HEART}}</div>
+          <div class="crow"><i class="a"></i><div class="tx"><b>d*****a</b><span>9 daq</span><br>Juda foydali, rahmat! 🔥</div>{{HEART}}</div>
+          <div class="cin"><i class="a"></i><div class="f"><span class="ph" id="cph">Izoh qo‘shing…</span><span class="pl" id="cpl">+</span></div><span class="post" id="cpost">Joylash</span></div>
+        </div>
+      </div>
+
+      <div id="fadeout" style="position:absolute;inset:0;background:#000;opacity:0;pointer-events:none"></div>
+
+      {{AUDIO}}
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: {{DUR}} }, 0);
+      tl.set("#cam", { rotationY: 0, x: 0, y: 0, scale: 1, clipPath: "circle(120% at 50.2% 32.3%)" }, 0);
+
+      {{TIMELINE}}
+
+      // ko'rishlar paneli: pastdan chiqadi, 5 000 -> 25 000 sanaladi, ustunlar o'sadi
+      tl.fromTo("#vsheet", { y: 800 }, { y: 0, duration: 0.5, ease: "power3.out" }, 3.64);
+      const vv = { v: 5000 }, vEl = document.getElementById("vnum");
+      tl.fromTo(vv, { v: 5000 }, { v: 25000, duration: 2.0, ease: "power2.inOut", onUpdate: () => { vEl.textContent = String(Math.round(vv.v / 50) * 50).replace(/\B(?=(\d{3})+(?!\d))/g, " "); } }, 3.82);
+      tl.fromTo("#views .chart i", { scaleY: 0.05 }, { scaleY: 1, duration: 0.6, ease: "power3.out", stagger: 0.18 }, 3.9);
+      tl.fromTo("#vx", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, 5.96);
+      tl.to("#vsheet", { y: 800, duration: 0.36, ease: "power2.in" }, 6.28);
+
+      // Direct: spiker dumaloq PiP ga kichrayadi (Direct ochiladi), keyin qaytadi
+      function pipIn(t) {
+        tl.to("#chrome", { opacity: 0, duration: 0.3, ease: "power2.inOut" }, t);
+        tl.fromTo("#cam", { scale: 1, x: 0, y: 0, rotationY: 0, transformOrigin: "50.2% 32.3%", clipPath: "circle(120% at 50.2% 32.3%)" },
+          { scale: 0.52, x: 268, y: 920, clipPath: "circle(26% at 50.2% 32.3%)", duration: 0.75, ease: "power3.inOut", immediateRender: false }, t);
+        tl.fromTo("#pipring", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false }, t + 0.55);
+      }
+      function pipOut(t) {
+        tl.to("#pipring", { opacity: 0, duration: 0.2, ease: "power2.in" }, t);
+        tl.to("#cam", { scale: 1, x: 0, y: 0, clipPath: "circle(120% at 50.2% 32.3%)", duration: 0.5, ease: "power3.inOut" }, t);
+        tl.to("#chrome", { opacity: 1, duration: 0.3, ease: "power2.inOut" }, t + 0.3);
+      }
+      pipIn(17.18);
+      [["#dm1a", 18.24], ["#dm1b", 19.04], ["#dm1c", 19.84], ["#dm1d", 20.30]].forEach(([id, t]) =>
+        tl.fromTo(id, { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, t));
+      tl.fromTo("#dm1d p i", { y: 0 }, { y: -8, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3, stagger: 0.1 }, 20.4);
+      tl.fromTo("#dm1s", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 20.98);
+      pipOut(21.42);
+
+      // savol qutisi: javob harfma-harf yoziladi
+      tl.fromTo("#qbin", { opacity: 0, scale: 0.8, y: 40, filter: "blur(10px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 22.5);
+      const ans = "storislarim ko‘rilmayapti…", qty = document.getElementById("qty");
+      qty.innerHTML = [...ans].map(c => "<i>" + (c === " " ? "&nbsp;" : c) + "</i>").join("");
+      tl.to("#qph", { opacity: 0, duration: 0.2 }, 24.86);
+      [...qty.children].forEach((c, i) => tl.set(c, { opacity: 1 }, 24.9 + i * 0.045));
+      tl.to("#qbin", { opacity: 0, scale: 0.92, filter: "blur(6px)", duration: 0.26, ease: "power2.in" }, 26.3);
+
+      // 3D storis karuseli: 1 -> 2 -> 3 (bitta proxy, seek-safe)
+      tl.fromTo("#cam", { filter: "blur(0px) brightness(1)" }, { filter: "blur(14px) brightness(0.5)", duration: 0.45, ease: "power2.out", immediateRender: false }, 38.5);
+      tl.to("#cam", { filter: "blur(0px) brightness(1)", duration: 0.3, ease: "power2.inOut" }, 42.62);
+      const car = { k: 0 }, cards = [0, 1, 2].map(i => document.getElementById("sc" + i));
+      const place = () => cards.forEach((c, i) => {
+        const d = i - car.k, a = Math.abs(d);
+        gsap.set(c, { x: d * 360, z: -a * 260, rotationY: -d * 38, scale: 1 - Math.min(a, 1) * 0.1, opacity: a > 1.6 ? 0 : 1 - a * 0.25, zIndex: 10 - Math.round(a * 3) });
+      });
+      tl.fromTo("#carou", { opacity: 0, y: 160 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 38.55);
+      tl.fromTo(car, { k: 0 }, { k: 0, duration: 0.01, onUpdate: place }, 38.5);
+      tl.to(car, { k: 1, duration: 0.55, ease: "power2.inOut", onUpdate: place }, 40.6);
+      tl.to(car, { k: 2, duration: 0.55, ease: "power2.inOut", onUpdate: place }, 41.2);
+      tl.to("#carou", { opacity: 0, y: -40, duration: 0.25, ease: "power2.in" }, 42.66);
+      tl.fromTo("#carl", { opacity: 0, scale: 0.86, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "power3.out" }, 41.66);
+      tl.to("#carlab .stk-in", { opacity: 0, duration: 0.24, ease: "power2.in" }, 42.66);
+
+      // izohlar oynasi: "+" yoziladi va joylanadi
+      tl.fromTo("#csheet", { y: 1100 }, { y: 0, duration: 0.5, ease: "power3.out" }, 46.62);
+      tl.to("#cph", { opacity: 0, duration: 0.15 }, 47.98);
+      tl.fromTo("#cpl", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 48.0);
+      tl.to("#cpost", { opacity: 1, duration: 0.25 }, 48.05);
+      tl.to("#cpost", { scale: 0.9, duration: 0.12, ease: "power2.inOut" }, 48.86);
+      tl.to("#cpost", { scale: 1, duration: 0.25, ease: "power3.out" }, 48.98);
+      tl.to("#cpl", { opacity: 0, duration: 0.15 }, 48.98);
+      tl.to("#cph", { opacity: 1, duration: 0.2 }, 49.05);
+      tl.fromTo("#newc", { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 49.0);
+      tl.fromTo("#newh", { scale: 0.6 }, { scale: 1, duration: 0.35, ease: "power3.out" }, 49.15);
+      tl.to("#csheet", { y: 1100, duration: 0.3, ease: "power2.in" }, 49.32);
+
+      // yakun: Direct'da sovg'a keladi, spiker PiP
+      pipIn(49.62);
+      tl.fromTo("#dm2a", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 49.9);
+      tl.fromTo("#dm2b", { opacity: 0, y: 60, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 50.3);
+      tl.fromTo("#dm2t", { color: "#ffffff" }, { color: "#feda75", duration: 0.3, ease: "power2.out", yoyo: true, repeat: 1 }, 51.86);
+      tl.fromTo("#dm2s", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 54.34);
+      tl.to("#fadeout", { opacity: 1, duration: 0.3, ease: "power2.in" }, 54.9);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
